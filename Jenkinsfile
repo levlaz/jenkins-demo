@@ -12,6 +12,28 @@ pipeline {
   stages {
     stage("dagger") {
       steps {
+        checkout ([
+          changelog: false, 
+          poll: false, 
+          scm: scmGit(
+            branches: [[name: '**']], 
+            browser: github('https://github.com/levlaz/jenkins-demo'), 
+            extensions: [
+              cloneOption(
+                honorRefspec: true, 
+                noTags: true, 
+                reference: '', 
+                shallow: false
+                ), 
+                lfs(), 
+                localBranch('main')
+            ], 
+            userRemoteConfigs: [
+              [
+                url: 'https://github.com/levlaz/jenkins-demo'
+                ]
+            ])
+        ])
         sh '''
             curl -L https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
             /var/jenkins_home/.local/bin/dagger -m github.com/shykes/daggerverse/hello@v0.1.2 call hello --greeting=bonjour --name=daggernaut
